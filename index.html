@@ -35,6 +35,54 @@
     }
   }
 </script>
+<script>
+  let downloadTimer;
+
+  function showPopup(downloadUrl) {
+    const popup = document.getElementById('downloadPopup');
+    const countdownEl = document.getElementById('countdown');
+    popup.classList.remove('hidden');
+
+    let timeLeft = 10;
+    countdownEl.textContent = timeLeft;
+
+    clearInterval(downloadTimer);
+    downloadTimer = setInterval(() => {
+      timeLeft--;
+      countdownEl.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(downloadTimer);
+        window.location.href = downloadUrl;
+        closePopup();
+      }
+    }, 1000);
+  }
+
+  function closePopup() {
+    document.getElementById('downloadPopup').classList.add('hidden');
+    clearInterval(downloadTimer);
+  }
+
+  function copyCommand() {
+    const cmd = document.getElementById('bypassCommand').innerText;
+    navigator.clipboard.writeText(cmd);
+    const btn = document.querySelector('.copy-btn');
+    const original = btn.textContent;
+    btn.textContent = '✅';
+    setTimeout(() => btn.textContent = original, 1000);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.download-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const downloadUrl = btn.getAttribute('href');
+        showPopup(downloadUrl);
+      });
+    });
+  });
+</script>
+
 
 </head>
 <body>
@@ -59,17 +107,17 @@
       <div class="card">
         <img src="assets/macos.svg" alt="macOS" />
         <h3>macOS</h3>
-        <a href="https://github.com/rajatyadavcse/CopyCatClipboard/releases/download/v1.0.8/CopyCat-1.0.0-arm64.dmg" class="btn">Download</a>
+        <a href="https://github.com/rajatyadavcse/CopyCatClipboard/releases/latest/download/CopyCat-1.0.0-arm64.dmg" class="download-btn">Download</a>
       </div>
       <div class="card">
         <img src="assets/windows.svg" alt="Windows" />
         <h3>Windows</h3>
-        <a href="https://github.com/rajatyadavcse/CopyCatClipboard/releases/download/v1.0.8/CopyCat.Setup.1.0.0.exe" class="btn">Download</a>
+        <a href="https://github.com/rajatyadavcse/CopyCatClipboard/releases/latest/download/CopyCat.Setup.1.0.0.exe" class="btn">Download</a>
       </div>
       <div class="card">
         <img src="assets/linux.svg" alt="Linux" />
         <h3>Linux</h3>
-        <a href="https://github.com/rajatyadavcse/CopyCatClipboard/releases/download/v1.0.8/copycat_1.0.0_amd64.deb" class="btn">Download</a>
+        <a href="https://github.com/rajatyadavcse/CopyCatClipboard/releases/latest/download/copycat_1.0.0_amd64.deb" class="btn">Download</a>
       </div>
     </div>
   </section>
@@ -113,5 +161,27 @@
   <footer>
     <p>© 2025 CopyCat by Rajat Yadav.</p>
   </footer>
+  <!-- Download Popup Modal -->
+<div id="downloadPopup" class="popup hidden">
+  <div class="popup-content">
+    <button class="close-btn" onclick="closePopup()">✕</button>
+    <h2>Thank you for downloading <span class="highlight">CopyCat</span>!</h2>
+    <p>Your download will start in <span id="countdown">10</span> seconds...</p>
+
+    <div class="warning">
+      <p><strong>Note for macOS users:</strong></p>
+      <p>If you see the message<br>
+      <em>“CopyCat is damaged and can’t be opened”</em>, it’s a Gatekeeper check by macOS.</p>
+      <p>You can bypass it safely by running this command in Terminal:</p>
+
+      <div class="command-box">
+        <code id="bypassCommand">xattr -cr /Applications/CopyCat.app</code>
+        <button class="copy-btn" onclick="copyCommand()" title="Copy command">📋</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
